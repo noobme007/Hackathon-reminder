@@ -1,0 +1,10 @@
+﻿[dotenv@17.2.3] injecting env (5) from .env -- tip: ≡ƒæÑ sync secrets across teammates & machines: https://dotenvx.com/ops
+DB Connected.
+Sending test email to kbyaswanth2907@gmail.com...
+Creating Ethereal Test Account...
+---------------------------------------------------
+Γ£à EMAIL SENT SUCCESSFULLY!
+---------------------------------------------------
+≡ƒæç CLICK THIS LINK TO VIEW THE EMAIL ≡ƒæç
+https://ethereal.email/message/aVyBXTKY-EBaUnFzaVyBYnaur3U3suXUAAAAAeJC4HYnbnvkyzKOp52gOFE
+---------------------------------------------------

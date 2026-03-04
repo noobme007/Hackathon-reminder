@@ -25,8 +25,8 @@ const initializeTransporter = async () => {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
             },
-            connectionTimeout: 15000,
-            socketTimeout: 15000,
+            connectionTimeout: 30000, // Increased to 30s
+            socketTimeout: 30000,     // Increased to 30s
         });
 
         // Verify the connection with timeout
@@ -34,7 +34,7 @@ const initializeTransporter = async () => {
         await Promise.race([
             transporter.verify(),
             new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Verification timeout after 15 seconds')), 15000)
+                setTimeout(() => reject(new Error('Verification timeout after 30 seconds')), 30000)
             )
         ]);
         
@@ -42,13 +42,14 @@ const initializeTransporter = async () => {
         return true;
     } catch (err) {
         console.error('❌ Failed to initialize email transporter:', err.message);
-        console.error('Stack:', err.stack);
+        // Don't log the whole stack to keep logs clean
         return false;
     }
 };
 
-// Initialize on module load
-initializeTransporter();
+// Initialize the transporter when this module is loaded
+// but don't let it block the main thread
+setTimeout(initializeTransporter, 1000);
 
 const sendEmail = async (to, subject, text) => {
     if (!transporter) {

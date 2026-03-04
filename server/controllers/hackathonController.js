@@ -4,15 +4,30 @@ const nodemailer = require('nodemailer');
 // Test email function
 const sendTestEmail = async (to, hackathonName) => {
     try {
+        console.log('📧 Attempting to send test email to:', to);
+        
         let transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
             },
+            connectionTimeout: 10000,
+            socketTimeout: 10000,
         });
 
-        await transporter.verify();
+        console.log('🔍 Verifying test transporter...');
+        console.log('EMAIL_USER:', process.env.EMAIL_USER);
+        console.log('EMAIL_PASS length:', process.env.EMAIL_PASS?.length, 'chars');
+
+        await Promise.race([
+            transporter.verify(),
+            new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Verification timeout')), 10000)
+            )
+        ]);
+
+        console.log('✅ Test transporter verified');
 
         const htmlContent = `
             <html>
@@ -48,9 +63,11 @@ const sendTestEmail = async (to, hackathonName) => {
             html: htmlContent,
         });
 
+        console.log('✅ Test email sent successfully to', to, 'Message ID:', info.messageId);
         return { success: true, messageId: info.messageId };
     } catch (error) {
-        console.error('Test email error:', error.message);
+        console.error('❌ Test email error:', error.message);
+        console.error('Error details:', error);
         return { success: false, error: error.message };
     }
 };

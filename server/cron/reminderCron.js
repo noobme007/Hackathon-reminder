@@ -9,9 +9,14 @@ const initializeTransporter = async () => {
     try {
         if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
             console.warn('⚠️ Email credentials not found. Email reminders will be disabled.');
-            console.warn('Set EMAIL_USER and EMAIL_PASS in environment variables.');
+            console.warn('EMAIL_USER:', process.env.EMAIL_USER ? '✓ Set' : '✗ Not set');
+            console.warn('EMAIL_PASS:', process.env.EMAIL_PASS ? '✓ Set' : '✗ Not set');
             return false;
         }
+
+        console.log('📧 Initializing email transporter...');
+        console.log('Using EMAIL_USER:', process.env.EMAIL_USER);
+        console.log('EMAIL_PASS length:', process.env.EMAIL_PASS.length, 'chars');
 
         // Use Gmail with App Password (generated in Google Account Settings)
         transporter = nodemailer.createTransport({
@@ -20,14 +25,24 @@ const initializeTransporter = async () => {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
             },
+            connectionTimeout: 10000,
+            socketTimeout: 10000,
         });
 
-        // Verify the connection
-        await transporter.verify();
+        // Verify the connection with timeout
+        console.log('🔍 Verifying transporter connection...');
+        await Promise.race([
+            transporter.verify(),
+            new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Verification timeout after 10 seconds')), 10000)
+            )
+        ]);
+        
         console.log('✅ Email transporter initialized and verified successfully');
         return true;
     } catch (err) {
         console.error('❌ Failed to initialize email transporter:', err.message);
+        console.error('Stack:', err.stack);
         return false;
     }
 };

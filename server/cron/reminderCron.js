@@ -14,42 +14,28 @@ const initializeTransporter = async () => {
             return false;
         }
 
-        console.log('📧 Initializing email transporter with Google SMTP...');
-        console.log('Using EMAIL_USER:', process.env.EMAIL_USER);
-        console.log('EMAIL_PASS length:', process.env.EMAIL_PASS.length, 'chars');
-
-        // Use Gmail SMTP
+        console.log('📧 Initializing email transporter...');
+        // Use direct Gmail SMTP settings
         transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true, // Use SSL
             auth: {
                 user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
+                pass: process.env.EMAIL_PASS.replace(/\s+/g, ''), // Remove any accidental spaces
             },
-            connectionTimeout: 30000, // Increased to 30s
-            socketTimeout: 30000,     // Increased to 30s
         });
 
-        // Verify the connection with timeout
-        console.log('🔍 Verifying transporter connection...');
-        await Promise.race([
-            transporter.verify(),
-            new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Verification timeout after 30 seconds')), 30000)
-            )
-        ]);
-        
-        console.log('✅ Email transporter initialized and verified successfully');
+        console.log('✅ Email transporter initialized (Ready to send)');
         return true;
     } catch (err) {
         console.error('❌ Failed to initialize email transporter:', err.message);
-        // Don't log the whole stack to keep logs clean
         return false;
     }
 };
 
-// Initialize the transporter when this module is loaded
-// but don't let it block the main thread
-setTimeout(initializeTransporter, 1000);
+// Initialize immediately but don't let it block
+initializeTransporter();
 
 const sendEmail = async (to, subject, text) => {
     if (!transporter) {

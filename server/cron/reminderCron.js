@@ -2,47 +2,9 @@ const cron = require('node-cron');
 const nodemailer = require('nodemailer');
 const Hackathon = require('../models/Hackathon');
 
-// Configure Email Transporter
-let transporter = null;
+const { sendEmail } = require('../utils/email');
 
-const initializeTransporter = async () => {
-    try {
-        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-            console.warn('⚠️ Email credentials not found. Email reminders will be disabled.');
-            console.warn('EMAIL_USER:', process.env.EMAIL_USER ? '✓ Set' : '✗ Not set');
-            console.warn('EMAIL_PASS:', process.env.EMAIL_PASS ? '✓ Set' : '✗ Not set');
-            return false;
-        }
-
-        console.log('📧 Initializing email transporter...');
-        // Use direct Gmail SMTP settings
-        transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true, // Use SSL
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS.replace(/\s+/g, ''), // Remove any accidental spaces
-            },
-        });
-
-        console.log('✅ Email transporter initialized (Ready to send)');
-        return true;
-    } catch (err) {
-        console.error('❌ Failed to initialize email transporter:', err.message);
-        return false;
-    }
-};
-
-// Initialize immediately but don't let it block
-initializeTransporter();
-
-const sendEmail = async (to, subject, text) => {
-    if (!transporter) {
-        console.warn(`⚠️ Email transporter not ready. Skipping email to ${to}`);
-        return false;
-    }
-
+const sendReminderEmail = async (to, subject, text) => {
     // Create HTML version of email
     const htmlContent = `
         <html>
@@ -63,22 +25,8 @@ const sendEmail = async (to, subject, text) => {
         </html>
     `;
 
-    const mailOptions = {
-        from: `"Hackathon Reminder" <${process.env.EMAIL_USER}>`,
-        to,
-        subject,
-        text,
-        html: htmlContent,
-    };
-
-    try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log(`✅ Email sent successfully to ${to} (Message ID: ${info.messageId})`);
-        return true;
-    } catch (error) {
-        console.error(`❌ Error sending email to ${to}:`, error.message);
-        return false;
-    }
+    const result = await sendEmail({ to, subject, text, html: htmlContent });
+    return result.success;
 };
 
 const checkReminders = async () => {
@@ -113,7 +61,7 @@ const checkReminders = async () => {
             // 3 Days Reminder (Between 1 and 3 days)
             if (regTimeDiff <= threeDaysInMs && regTimeDiff > oneDayInMs && !hackathon.registrationReminderSent_3days) {
                 console.log(`📧 Sending 3-day registration reminder for "${hackathon.name}" to ${userEmail}`);
-                const success = await sendEmail(
+                const success = await sendReminderEmail(
                     userEmail,
                     `Reminder: 3 Days left to Register for ${hackathon.name}`,
                     `Hello ${hackathon.userId.name},\n\nThis is a gentle reminder that the registration deadline for "${hackathon.name}" is in 3 days on ${new Date(hackathon.registrationDeadline).toLocaleString()}.\n\nDon't miss out!\n\nBest,\nHackathon Reminder App`
@@ -128,7 +76,7 @@ const checkReminders = async () => {
             // 1 Day Reminder (Less than 1 day)
             if (regTimeDiff <= oneDayInMs && regTimeDiff > 0 && !hackathon.registrationReminderSent_1day) {
                 console.log(`📧 Sending 1-day registration reminder for "${hackathon.name}" to ${userEmail}`);
-                const success = await sendEmail(
+                const success = await sendReminderEmail(
                     userEmail,
                     `URGENT: 1 Day left to Register for ${hackathon.name}`,
                     `Hello ${hackathon.userId.name},\n\nURGENT REMINDER: The registration deadline for "${hackathon.name}" is tomorrow, ${new Date(hackathon.registrationDeadline).toLocaleString()}.\n\nRegister now!\n\nBest,\nHackathon Reminder App`
@@ -147,7 +95,7 @@ const checkReminders = async () => {
             // 3 Days Reminder
             if (pptTimeDiff <= threeDaysInMs && pptTimeDiff > oneDayInMs && !hackathon.pptReminderSent_3days) {
                 console.log(`📧 Sending 3-day PPT reminder for "${hackathon.name}" to ${userEmail}`);
-                const success = await sendEmail(
+                const success = await sendReminderEmail(
                     userEmail,
                     `Reminder: 3 Days left for PPT Submission - ${hackathon.name}`,
                     `Hello ${hackathon.userId.name},\n\nThis is a reminder that the PPT/Submission deadline for "${hackathon.name}" is in 3 days on ${new Date(hackathon.pptDeadline).toLocaleString()}.\n\nGood luck with your project!\n\nBest,\nHackathon Reminder App`
@@ -162,7 +110,7 @@ const checkReminders = async () => {
             // 1 Day Reminder
             if (pptTimeDiff <= oneDayInMs && pptTimeDiff > 0 && !hackathon.pptReminderSent_1day) {
                 console.log(`📧 Sending 1-day PPT reminder for "${hackathon.name}" to ${userEmail}`);
-                const success = await sendEmail(
+                const success = await sendReminderEmail(
                     userEmail,
                     `URGENT: 1 Day left for PPT Submission - ${hackathon.name}`,
                     `Hello ${hackathon.userId.name},\n\nURGENT: The PPT/Submission deadline for "${hackathon.name}" is tomorrow, ${new Date(hackathon.pptDeadline).toLocaleString()}.\n\nSubmit your work soon!\n\nBest,\nHackathon Reminder App`

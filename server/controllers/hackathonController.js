@@ -1,66 +1,35 @@
 const Hackathon = require('../models/Hackathon');
-const nodemailer = require('nodemailer');
+const { sendEmail } = require('../utils/email');
 
-// Test email function
+// Test email function using centralized utility
 const sendTestEmail = async (to, hackathonName) => {
-    try {
-        console.log('📧 Attempting to send test email to:', to);
+    console.log('🧪 Starting test email for:', hackathonName);
 
-        let transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true, // Use SSL
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS.replace(/\s+/g, ''), // Remove any accidental spaces
-            },
-            connectionTimeout: 30000, // 30 seconds
-            socketTimeout: 30000,
-        });
-
-        console.log('✅ Test transporter configured');
-
-        const htmlContent = `
-            <html>
-                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
-                            <h1 style="margin: 0;">🧪 TEST EMAIL - Hackathon Reminder</h1>
-                        </div>
-                        <div style="border: 1px solid #e0e0e0; padding: 20px; border-radius: 0 0 8px 8px;">
-                            <p style="font-size: 16px;">Hi there!</p>
-                            <p style="font-size: 14px;">This is a <strong>TEST EMAIL</strong> from your Hackathon Reminder App.</p>
-                            <p style="font-size: 14px;">If you received this, your email system is working perfectly! ✅</p>
-                            <div style="background: #e8f5e9; border-left: 4px solid #4caf50; padding: 15px; margin: 20px 0; border-radius: 4px;">
-                                <p style="margin: 0; font-weight: bold; color: #2e7d32;">Test Details:</p>
-                                <p style="margin: 5px 0;">Hackathon: ${hackathonName}</p>
-                                <p style="margin: 5px 0;">Test Time: ${new Date().toLocaleString()}</p>
-                            </div>
-                            <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;">
-                            <p style="color: #666; font-size: 12px;">
-                                You can now safely delete the test button from your app. Email reminders are working! 🎉
-                            </p>
+    const htmlContent = `
+        <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
+                        <h1 style="margin: 0;">🧪 TEST SUCCESS!</h1>
+                    </div>
+                    <div style="border: 1px solid #e0e0e0; padding: 20px; border-radius: 0 0 8px 8px;">
+                        <p style="font-size: 16px;">This confirms your email system is <strong>working perfectly</strong> on Render! ✅</p>
+                        <div style="background: #e8f5e9; border-left: 4px solid #4caf50; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                            <p style="margin: 0;">Hackathon: <strong>${hackathonName}</strong></p>
+                            <p style="margin: 5px 0;">Time: ${new Date().toLocaleString()}</p>
                         </div>
                     </div>
-                </body>
-            </html>
-        `;
+                </div>
+            </body>
+        </html>
+    `;
 
-        const info = await transporter.sendMail({
-            from: `"Hackathon Reminder" <${process.env.EMAIL_USER}>`,
-            to,
-            subject: '🧪 TEST: Hackathon Reminder Email Test',
-            text: `This is a test email for hackathon: ${hackathonName}`,
-            html: htmlContent,
-        });
-
-        console.log('✅ Test email sent successfully to', to, 'Message ID:', info.messageId);
-        return { success: true, messageId: info.messageId };
-    } catch (error) {
-        console.error('❌ Test email error:', error.message);
-        console.error('Error details:', error);
-        return { success: false, error: error.message };
-    }
+    return await sendEmail({
+        to,
+        subject: `🧪 TEST: ${hackathonName} Email Check`,
+        text: `This is a test email for hackathon: ${hackathonName}`,
+        html: htmlContent,
+    });
 };
 
 // Get all hackathons for logged in user

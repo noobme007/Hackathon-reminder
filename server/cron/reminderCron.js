@@ -14,19 +14,19 @@ const initializeTransporter = async () => {
             return false;
         }
 
-        console.log('📧 Initializing email transporter...');
+        console.log('📧 Initializing email transporter with Google SMTP...');
         console.log('Using EMAIL_USER:', process.env.EMAIL_USER);
         console.log('EMAIL_PASS length:', process.env.EMAIL_PASS.length, 'chars');
 
-        // Use Gmail with App Password (generated in Google Account Settings)
+        // Use Gmail SMTP
         transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
             },
-            connectionTimeout: 10000,
-            socketTimeout: 10000,
+            connectionTimeout: 15000,
+            socketTimeout: 15000,
         });
 
         // Verify the connection with timeout
@@ -34,7 +34,7 @@ const initializeTransporter = async () => {
         await Promise.race([
             transporter.verify(),
             new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Verification timeout after 10 seconds')), 10000)
+                setTimeout(() => reject(new Error('Verification timeout after 15 seconds')), 15000)
             )
         ]);
         

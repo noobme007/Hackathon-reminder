@@ -14,14 +14,18 @@ const PORT = process.env.PORT || 5000;
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
-// Root Endpoint (Moved up for Railway Health Checks)
-app.get('/', (req, res) => {
-    res.status(200).send('Hackathon Reminder API is running...');
-});
+// 1. HEALTH CHECK (MUST BE FIRST)
+app.get('/health', (req, res) => res.status(200).send('OK'));
+app.get('/', (req, res) => res.status(200).send('API is Live'));
 
 // Middleware
-app.use(helmet()); // Security Headers
+app.use(helmet({
+    contentSecurityPolicy: false, // Less restrictive for easier connection
+}));
 app.use(express.json());
+
+// Trust Proxy (Required for Railway/Render/Vercel)
+app.set('trust proxy', 1);
 
 // Rate Limiting
 const limiter = rateLimit({
@@ -52,7 +56,11 @@ mongoose
         console.error('MongoDB Connection Failed:', err);
     });
 
-// Start Server immediately for Railway Health Check
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port ${PORT} (0.0.0.0)`);
+// Start Server immediately
+const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server ready on port ${PORT}`);
 });
+
+// Avoid timeout issues
+server.keepAliveTimeout = 120000;
+server.headersTimeout = 125000;

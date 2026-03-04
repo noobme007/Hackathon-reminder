@@ -1,4 +1,59 @@
 const Hackathon = require('../models/Hackathon');
+const nodemailer = require('nodemailer');
+
+// Test email function
+const sendTestEmail = async (to, hackathonName) => {
+    try {
+        let transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+
+        await transporter.verify();
+
+        const htmlContent = `
+            <html>
+                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
+                            <h1 style="margin: 0;">🧪 TEST EMAIL - Hackathon Reminder</h1>
+                        </div>
+                        <div style="border: 1px solid #e0e0e0; padding: 20px; border-radius: 0 0 8px 8px;">
+                            <p style="font-size: 16px;">Hi there!</p>
+                            <p style="font-size: 14px;">This is a <strong>TEST EMAIL</strong> from your Hackathon Reminder App.</p>
+                            <p style="font-size: 14px;">If you received this, your email system is working perfectly! ✅</p>
+                            <div style="background: #e8f5e9; border-left: 4px solid #4caf50; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                                <p style="margin: 0; font-weight: bold; color: #2e7d32;">Test Details:</p>
+                                <p style="margin: 5px 0;">Hackathon: ${hackathonName}</p>
+                                <p style="margin: 5px 0;">Test Time: ${new Date().toLocaleString()}</p>
+                            </div>
+                            <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;">
+                            <p style="color: #666; font-size: 12px;">
+                                You can now safely delete the test button from your app. Email reminders are working! 🎉
+                            </p>
+                        </div>
+                    </div>
+                </body>
+            </html>
+        `;
+
+        const info = await transporter.sendMail({
+            from: `"Hackathon Reminder" <${process.env.EMAIL_USER}>`,
+            to,
+            subject: '🧪 TEST: Hackathon Reminder Email Test',
+            text: `This is a test email for hackathon: ${hackathonName}`,
+            html: htmlContent,
+        });
+
+        return { success: true, messageId: info.messageId };
+    } catch (error) {
+        console.error('Test email error:', error.message);
+        return { success: false, error: error.message };
+    }
+};
 
 // Get all hackathons for logged in user
 exports.getHackathons = async (req, res) => {
@@ -87,6 +142,45 @@ exports.deleteHackathon = async (req, res) => {
 
         res.status(200).json({ id: req.params.id });
     } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// Send test email
+exports.sendTestEmail = async (req, res) => {
+    try {
+        const { hackathonId } = req.params;
+
+        const hackathon = await Hackathon.findById(hackathonId).populate('userId');
+
+        if (!hackathon) {
+            return res.status(404).json({ message: 'Hackathon not found' });
+        }
+
+        if (!req.user) {
+            return res.status(401).json({ message: 'User not found' });
+        }
+
+        if (hackathon.userId._id.toString() !== req.user.id) {
+            return res.status(401).json({ message: 'User not authorized' });
+        }
+
+        const result = await sendTestEmail(hackathon.userId.email, hackathon.name);
+
+        if (result.success) {
+            res.status(200).json({ 
+                message: 'Test email sent successfully!',
+                hackathonName: hackathon.name,
+                email: hackathon.userId.email
+            });
+        } else {
+            res.status(500).json({ 
+                message: 'Failed to send test email',
+                error: result.error 
+            });
+        }
+    } catch (error) {
+        console.error(error);
         res.status(500).json({ message: 'Server Error' });
     }
 };

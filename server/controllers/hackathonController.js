@@ -5,29 +5,20 @@ const nodemailer = require('nodemailer');
 const sendTestEmail = async (to, hackathonName) => {
     try {
         console.log('📧 Attempting to send test email to:', to);
-        
+
         let transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true, // Use SSL
             auth: {
                 user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
+                pass: process.env.EMAIL_PASS.replace(/\s+/g, ''), // Remove any accidental spaces
             },
-            connectionTimeout: 10000,
-            socketTimeout: 10000,
+            connectionTimeout: 30000, // 30 seconds
+            socketTimeout: 30000,
         });
 
-        console.log('🔍 Verifying test transporter...');
-        console.log('EMAIL_USER:', process.env.EMAIL_USER);
-        console.log('EMAIL_PASS length:', process.env.EMAIL_PASS?.length, 'chars');
-
-        await Promise.race([
-            transporter.verify(),
-            new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Verification timeout')), 10000)
-            )
-        ]);
-
-        console.log('✅ Test transporter verified');
+        console.log('✅ Test transporter configured');
 
         const htmlContent = `
             <html>
@@ -185,15 +176,15 @@ exports.sendTestEmail = async (req, res) => {
         const result = await sendTestEmail(hackathon.userId.email, hackathon.name);
 
         if (result.success) {
-            res.status(200).json({ 
+            res.status(200).json({
                 message: 'Test email sent successfully!',
                 hackathonName: hackathon.name,
                 email: hackathon.userId.email
             });
         } else {
-            res.status(500).json({ 
+            res.status(500).json({
                 message: 'Failed to send test email',
-                error: result.error 
+                error: result.error
             });
         }
     } catch (error) {

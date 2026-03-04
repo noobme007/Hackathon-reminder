@@ -1,10 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 
 const Navbar = () => {
     const { user, logout } = useContext(AuthContext);
     const navigate = useNavigate();
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const handleLogout = () => {
         logout();
@@ -12,45 +13,120 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="bg-white shadow">
+        <nav className="bg-white shadow-lg border-b border-gray-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between h-16">
-                    <div className="flex items-center">
-                        <Link to="/" className="flex-shrink-0 flex items-center">
-                            <span className="font-bold text-2xl text-primary">HackReminder</span>
-                        </Link>
-                        {user && (
-                            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                                <Link to="/" className="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-indigo-500 text-sm font-medium">
-                                    Dashboard
-                                </Link>
-                                <Link to="/add" className="text-gray-500 hover:text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-indigo-500 text-sm font-medium">
-                                    Add Hackathon
-                                </Link>
-                            </div>
-                        )}
-                    </div>
-                    <div className="flex items-center">
+                <div className="flex justify-between items-center h-16">
+                    {/* Logo */}
+                    <Link to="/" className="flex items-center space-x-3 flex-shrink-0">
+                        <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-blue-600 rounded-lg flex items-center justify-center">
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <span className="font-bold text-2xl bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">HackReminder</span>
+                    </Link>
+
+                    {/* Desktop Menu */}
+                    {user && (
+                        <div className="hidden md:flex md:items-center md:space-x-8">
+                            <Link to="/" className="text-gray-700 hover:text-indigo-600 font-medium text-sm transition flex items-center space-x-1">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-3m0 0l7-4 7 4M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10M9 21h6" />
+                                </svg>
+                                <span>Dashboard</span>
+                            </Link>
+                            <Link to="/add" className="text-gray-700 hover:text-indigo-600 font-medium text-sm transition flex items-center space-x-1">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                </svg>
+                                <span>Add Hackathon</span>
+                            </Link>
+                        </div>
+                    )}
+
+                    {/* Right Section */}
+                    <div className="flex items-center space-x-4">
                         {user ? (
-                            <div className="flex items-center space-x-4">
-                                <span className="text-gray-700 font-medium hidden md:block">Hi, {user.name}</span>
+                            <>
+                                {/* User Info - Hidden on Mobile */}
+                                <div className="hidden md:flex md:items-center md:space-x-3 md:border-r md:border-gray-300 md:pr-4">
+                                    <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                                        {user.name?.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                                        <p className="text-xs text-gray-500">{user.email}</p>
+                                    </div>
+                                </div>
+
+                                {/* Logout Button */}
                                 <button
                                     onClick={handleLogout}
-                                    className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-md text-sm font-medium transition"
+                                    className="hidden md:inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-red-50 text-gray-700 hover:text-red-600 rounded-lg font-medium text-sm transition space-x-2"
                                 >
-                                    Logout
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                    </svg>
+                                    <span>Logout</span>
                                 </button>
-                            </div>
+
+                                {/* Mobile Menu Button */}
+                                <button
+                                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                    className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition"
+                                >
+                                    <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                </button>
+                            </>
                         ) : (
-                            <div className="space-x-4">
-                                <Link to="/login" className="text-gray-500 hover:text-gray-900 font-medium">Login</Link>
-                                <Link to="/signup" className="bg-primary text-white px-4 py-2 rounded-md font-medium hover:bg-indigo-700 transition">
+                            <div className="flex items-center space-x-3">
+                                <Link to="/login" className="text-gray-700 hover:text-indigo-600 font-medium text-sm transition">
+                                    Login
+                                </Link>
+                                <Link to="/signup" className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-lg font-medium text-sm hover:shadow-lg transition">
                                     Sign Up
                                 </Link>
                             </div>
                         )}
                     </div>
                 </div>
+
+                {/* Mobile Menu */}
+                {user && mobileMenuOpen && (
+                    <div className="md:hidden border-t border-gray-200 py-4 space-y-3">
+                        <Link
+                            to="/"
+                            className="block px-4 py-2 text-gray-700 hover:bg-indigo-50 rounded-lg transition"
+                            onClick={() => setMobileMenuOpen(false)}
+                        >
+                            Dashboard
+                        </Link>
+                        <Link
+                            to="/add"
+                            className="block px-4 py-2 text-gray-700 hover:bg-indigo-50 rounded-lg transition"
+                            onClick={() => setMobileMenuOpen(false)}
+                        >
+                            Add Hackathon
+                        </Link>
+                        <div className="border-t border-gray-200 pt-3">
+                            <div className="px-4 py-2 mb-3">
+                                <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                                <p className="text-xs text-gray-500">{user.email}</p>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    handleLogout();
+                                    setMobileMenuOpen(false);
+                                }}
+                                className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition font-medium text-sm"
+                            >
+                                Logout
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </nav>
     );

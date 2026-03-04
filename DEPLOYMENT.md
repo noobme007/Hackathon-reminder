@@ -35,10 +35,19 @@ Render is a great free choice for Node.js apps.
     *   Add the following keys and values:
         *   `MONGO_URI`: (Paste your Atlas connection string from Step 1)
         *   `JWT_SECRET`: (Create a strong random password, e.g., `mySuperSecretKey2026`)
-        *   `EMAIL_USER`: `notificationguys@gmail.com`
-        *   `EMAIL_PASS`: `yqlchvztggwuhfwr`
+        *   `EMAIL_USER`: Your Gmail address (e.g., `your-email@gmail.com`)
+        *   `EMAIL_PASS`: **Gmail App Password** (NOT your regular Gmail password)
         *   `CLIENT_URL`: `https://your-frontend-project.vercel.app` (You will get this URL in Step 3, come back and update it later!)
 7.  Click **Deploy Web Service**.
+
+### 📧 How to Get Gmail App Password:
+1. Go to [Google Account Security](https://myaccount.google.com/security)
+2. Enable **2-Step Verification** if not already enabled
+3. Scroll down to **App passwords** (appears only after 2FA is enabled)
+4. Select **Mail** and **Windows Computer** (or your device)
+5. Google will generate a 16-character password - copy this
+6. Paste this into `EMAIL_PASS` environment variable (remove spaces)
+7. Keep this password safe - it's like a secondary password just for this app
 
 ---
 

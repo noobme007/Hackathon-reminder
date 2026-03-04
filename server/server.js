@@ -40,19 +40,19 @@ app.get('/', (req, res) => {
     res.send('Hackathon Reminder API is running...');
 });
 
-// Database Connection & Server Start
+// Database Connection
 mongoose
     .connect(process.env.MONGO_URI)
     .then(() => {
         console.log('MongoDB Connected Successfully');
-
-        // Start Cron Job
+        // Start Cron Job only after DB is ready
         startCron();
-
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-        });
     })
     .catch((err) => {
         console.error('MongoDB Connection Failed:', err);
     });
+
+// Start Server immediately for Railway Health Check
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});

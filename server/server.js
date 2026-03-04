@@ -14,6 +14,11 @@ const PORT = process.env.PORT || 5000;
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
+// Root Endpoint (Moved up for Railway Health Checks)
+app.get('/', (req, res) => {
+    res.status(200).send('Hackathon Reminder API is running...');
+});
+
 // Middleware
 app.use(helmet()); // Security Headers
 app.use(express.json());
@@ -35,11 +40,6 @@ app.use(cors({
 app.use('/api/auth', authRoutes);
 app.use('/api/hackathons', hackathonRoutes);
 
-// Root Endpoint
-app.get('/', (req, res) => {
-    res.send('Hackathon Reminder API is running...');
-});
-
 // Database Connection
 mongoose
     .connect(process.env.MONGO_URI)
@@ -53,6 +53,6 @@ mongoose
     });
 
 // Start Server immediately for Railway Health Check
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT} (0.0.0.0)`);
 });

@@ -1,5 +1,4 @@
 const Hackathon = require('../models/Hackathon');
-const Hackathon = require('../models/Hackathon');
 
 // Get all hackathons for logged in user
 exports.getHackathons = async (req, res) => {
@@ -106,12 +105,4 @@ exports.deleteHackathon = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Server Error' });
     }
-};
-
-await hackathon.deleteOne();
-
-res.status(200).json({ id: req.params.id });
-    } catch (error) {
-    res.status(500).json({ message: 'Server Error' });
-}
 };

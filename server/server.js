@@ -100,7 +100,7 @@ mongoose
     .then(() => {
         console.log('MongoDB Connected Successfully');
         // Start Cron Job only after DB is ready
-        startCron();
+        // startCron();
     })
     .catch((err) => {
         console.error('MongoDB Connection Failed:', err);

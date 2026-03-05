@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const hackathonRoutes = require('./routes/hackathonRoutes');
-const startCron = require('./cron/reminderCron');
+// const startCron = require('./cron/reminderCron');
 
 dotenv.config();
 

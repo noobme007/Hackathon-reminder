@@ -135,60 +135,77 @@ const HackathonCard = ({ hackathon, onDelete }) => {
                     )}
                 </div>
 
-                {/* Notifications Badge */}
-                {hackathon.notificationsEnabled !== false && (
-                    <div className="mt-3 flex items-center text-xs text-green-700 bg-green-50 px-2 py-1 rounded border border-green-100">
-                        <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10.5 1.5H3a1.5 1.5 0 00-1.5 1.5v12a1.5 1.5 0 001.5 1.5h10a1.5 1.5 0 001.5-1.5V11M17 2l-5 5m0 0l-2-2m2 2l2-2" />
-                        </svg>
-                        Email reminders enabled
-                    </div>
-                )}
+                {/* Status Badges */}
+                <div className="mt-4 flex flex-wrap gap-2">
+                    {hackathon.notificationsEnabled !== false && (
+                        <div className="flex items-center text-[10px] font-bold uppercase tracking-wider text-green-700 bg-green-50 px-2 py-1 rounded border border-green-100">
+                            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                            Email Alerts
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex flex-col gap-3">
-                {testMessage && (
-                    <div className={`text-sm font-medium px-3 py-2 rounded-lg ${
-                        testMessage.includes('✅') 
-                            ? 'bg-green-50 text-green-700' 
-                            : 'bg-red-50 text-red-700'
-                    }`}>
-                        {testMessage}
-                    </div>
-                )}
-                <div className="flex justify-between items-center gap-2">
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex flex-col gap-3 mt-auto">
+                <div className="flex flex-wrap items-center gap-2">
+                    {hackathon.googleEventLink && (
+                        <a
+                            href={hackathon.googleEventLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 min-w-[140px] inline-flex items-center justify-center px-3 py-2 text-xs font-bold uppercase tracking-wider text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm hover:shadow transition-all group"
+                        >
+                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Calendar Event
+                            <svg className="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transform translate-x-[-4px] group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </a>
+                    )}
                     <button
                         onClick={handleTestEmail}
                         disabled={testLoading}
-                        className="text-xs font-medium px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded transition disabled:opacity-50"
-                        title="Send a test email to verify reminders are working"
+                        className="flex-1 min-w-[110px] inline-flex items-center justify-center px-3 py-2 text-xs font-bold uppercase tracking-wider bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg transition disabled:opacity-50"
+                        title="Send a test email to verify reminders"
                     >
-                        {testLoading ? '⏳ Sending...' : '📧 Test Email'}
+                        {testLoading ? '⏳ Wait' : '📧 Test Email'}
                     </button>
-                    <div className="flex justify-end space-x-2">
-                        <Link
-                            to={`/edit/${hackathon._id}`}
-                            className="inline-flex items-center px-3 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition"
-                            title="Edit hackathon"
-                        >
-                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                            Edit
-                        </Link>
-                        <button
-                            onClick={() => onDelete(hackathon._id)}
-                            className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition"
-                            title="Delete hackathon"
-                        >
-                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                            Delete
-                        </button>
-                    </div>
                 </div>
+
+                <div className="flex justify-end items-center gap-2 pt-2 border-t border-gray-200/50">
+                    <Link
+                        to={`/edit/${hackathon._id}`}
+                        className="inline-flex items-center px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:text-indigo-600 hover:bg-white rounded-xl transition-all border border-transparent hover:border-slate-200 shadow-none hover:shadow-sm"
+                    >
+                        <svg className="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Edit
+                    </Link>
+                    <button
+                        onClick={() => onDelete(hackathon._id)}
+                        className="inline-flex items-center px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-red-600 hover:bg-white rounded-xl transition-all border border-transparent hover:border-slate-200 shadow-none hover:shadow-sm"
+                    >
+                        <svg className="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Delete
+                    </button>
+                </div>
+
+                {testMessage && (
+                    <div className={`mt-2 text-[11px] font-bold px-3 py-2 rounded-lg text-center animate-in fade-in slide-in-from-top-2 duration-300 ${testMessage.includes('✅')
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                        : 'bg-red-50 text-red-700 border border-red-100'
+                        }`}>
+                        {testMessage}
+                    </div>
+                )}
             </div>
         </div>
     );

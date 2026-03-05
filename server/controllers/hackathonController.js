@@ -67,7 +67,11 @@ exports.createHackathon = async (req, res) => {
 
         if (user && user.accessToken) {
             const { addEventToGoogleCalendar } = require('../utils/googleCalendar');
-            await addEventToGoogleCalendar(user, hackathon);
+            const googleLink = await addEventToGoogleCalendar(user, hackathon);
+            if (googleLink) {
+                hackathon.googleEventLink = googleLink;
+                await hackathon.save();
+            }
         }
 
         res.status(201).json(hackathon);

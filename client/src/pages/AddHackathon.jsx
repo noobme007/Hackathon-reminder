@@ -56,220 +56,322 @@ const AddHackathon = () => {
     };
 
     return (
-        <div className="max-w-3xl mx-auto py-6">
-            <div className="mb-8">
-                <Link to="/" className="text-indigo-600 hover:text-indigo-700 flex items-center mb-4">
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                    Back to Dashboard
-                </Link>
-                <h1 className="text-4xl font-bold text-gray-900">Add New Hackathon</h1>
-                <p className="text-gray-600 mt-2">Create a reminder for an upcoming hackathon event</p>
-            </div>
-
-            {error && (
-                <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start">
-                    <svg className="w-5 h-5 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                    </svg>
-                    <div>{error}</div>
-                </div>
-            )}
-
-            {successMessage && (
-                <div className="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-start">
-                    <svg className="w-5 h-5 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <div>{successMessage}</div>
-                </div>
-            )}
-
-            <div className="bg-white shadow-lg rounded-xl overflow-hidden">
-                <form onSubmit={handleSubmit} className="divide-y divide-gray-200">
-                    {/* Basic Information */}
-                    <div className="px-6 py-8">
-                        <h2 className="text-xl font-semibold text-gray-900 mb-6">Basic Information</h2>
-                        <div className="space-y-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Hackathon Name *</label>
-                                <input
-                                    type="text"
-                                    required
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                    placeholder="e.g. HackMIT 2026, DevCon Hackathon"
-                                    value={name}
-                                    onChange={e => setName(e.target.value)}
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                        placeholder="e.g. San Francisco, CA"
-                                        value={location}
-                                        onChange={e => setLocation(e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Prize Pool</label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                        placeholder="e.g. $10,000"
-                                        value={prize}
-                                        onChange={e => setPrize(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                                <textarea
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                    rows="3"
-                                    placeholder="Add any additional details about the hackathon..."
-                                    value={description}
-                                    onChange={e => setDescription(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Deadlines */}
-                    <div className="px-6 py-8">
-                        <h2 className="text-xl font-semibold text-gray-900 mb-6">Deadlines</h2>
-                        <div className="space-y-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Registration Deadline *</label>
-                                <input
-                                    type="datetime-local"
-                                    required
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                    value={regDate}
-                                    onChange={e => setRegDate(e.target.value)}
-                                />
-                                <p className="mt-2 text-xs text-gray-500">Date & time when registration closes</p>
-                            </div>
-
-                            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                                <div className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        id="includePpt"
-                                        checked={includePpt}
-                                        onChange={e => setIncludePpt(e.target.checked)}
-                                        className="h-4 w-4 text-indigo-600 rounded focus:ring-indigo-500"
-                                    />
-                                    <label htmlFor="includePpt" className="ml-3 text-sm font-medium text-gray-900">
-                                        Include PPT/Submission Deadline
-                                    </label>
-                                </div>
-                                <p className="mt-2 text-xs text-gray-500">Uncheck if this hackathon only requires registration</p>
-                            </div>
-
-                            {includePpt && (
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">PPT/Submission Deadline</label>
-                                    <input
-                                        type="datetime-local"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                        value={pptDate}
-                                        onChange={e => setPptDate(e.target.value)}
-                                    />
-                                    <p className="mt-2 text-xs text-gray-500">Date & time for final project submission</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Additional Details */}
-                    <div className="px-6 py-8">
-                        <h2 className="text-xl font-semibold text-gray-900 mb-6">Additional Details</h2>
-                        <div className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                                    <select
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                        value={category}
-                                        onChange={e => setCategory(e.target.value)}
-                                    >
-                                        <option>Web Development</option>
-                                        <option>Mobile Development</option>
-                                        <option>Machine Learning</option>
-                                        <option>AI/LLM</option>
-                                        <option>DevOps</option>
-                                        <option>Blockchain</option>
-                                        <option>IoT</option>
-                                        <option>Other</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
-                                    <select
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                        value={priority}
-                                        onChange={e => setPriority(e.target.value)}
-                                    >
-                                        <option>Low</option>
-                                        <option>Medium</option>
-                                        <option>High</option>
-                                        <option>Critical</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Team Size</label>
-                                <input
-                                    type="text"
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                    placeholder="e.g. 1-5 members"
-                                    value={teamSize}
-                                    onChange={e => setTeamSize(e.target.value)}
-                                />
-                            </div>
-
-                            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                                <div className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        id="notifications"
-                                        checked={notificationsEnabled}
-                                        onChange={e => setNotificationsEnabled(e.target.checked)}
-                                        className="h-4 w-4 text-indigo-600 rounded focus:ring-indigo-500"
-                                    />
-                                    <label htmlFor="notifications" className="ml-3 text-sm font-medium text-gray-900">
-                                        Enable Email Reminders
-                                    </label>
-                                </div>
-                                <p className="mt-2 text-xs text-gray-500">You'll receive reminders 3 days and 1 day before each deadline</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="px-6 py-8 bg-gray-50 flex justify-end space-x-4">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto">
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+                    <div>
                         <Link
                             to="/"
-                            className="px-6 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-100 transition"
+                            className="inline-flex items-center text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors mb-4 group"
                         >
-                            Cancel
+                            <svg className="w-4 h-4 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2 / 1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            Back to Dashboard
                         </Link>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="px-6 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 disabled:bg-gray-400 transition"
-                        >
-                            {loading ? 'Saving...' : 'Save Hackathon'}
-                        </button>
+                        <h1 className="text-5xl font-black text-slate-900 tracking-tight">
+                            Create <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Reminder</span>
+                        </h1>
+                        <p className="text-slate-500 text-lg mt-3 font-medium">Never miss another deadline. We'll handle the tracking for you.</p>
                     </div>
-                </form>
+                </div>
+
+                {/* Main Card */}
+                <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl shadow-indigo-200/50 border border-white overflow-hidden">
+                    <form onSubmit={handleSubmit} className="divide-y divide-slate-100">
+
+                        {/* Status Messages */}
+                        {(error || successMessage) && (
+                            <div className="px-8 py-6">
+                                {error && (
+                                    <div className="bg-red-50/50 backdrop-blur-sm border border-red-100 text-red-800 px-6 py-4 rounded-2xl flex items-center animate-in fade-in slide-in-from-top-4 duration-300">
+                                        <div className="bg-red-500 rounded-full p-1 mr-4 shadow-lg shadow-red-200">
+                                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </div>
+                                        <span className="font-semibold">{error}</span>
+                                    </div>
+                                )}
+                                {successMessage && (
+                                    <div className="bg-emerald-50/50 backdrop-blur-sm border border-emerald-100 text-emerald-800 px-6 py-4 rounded-2xl flex flex-col md:flex-row items-center justify-between animate-in fade-in slide-in-from-top-4 duration-300 gap-4">
+                                        <div className="flex items-center">
+                                            <div className="bg-emerald-500 rounded-full p-1 mr-4 shadow-lg shadow-emerald-200">
+                                                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </div>
+                                            <span className="font-bold">{successMessage}</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Grid Context */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2">
+
+                            {/* Left Column: Basic Info */}
+                            <div className="p-8 lg:p-10 space-y-8 border-r border-slate-100">
+                                <section>
+                                    <div className="flex items-center mb-6">
+                                        <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center mr-3 font-bold">1</div>
+                                        <h2 className="text-xl font-bold text-slate-800">Event Details</h2>
+                                    </div>
+
+                                    <div className="space-y-6">
+                                        <div className="group">
+                                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">Hackathon Name</label>
+                                            <input
+                                                type="text"
+                                                required
+                                                className="w-full px-5 py-3.5 bg-slate-50 border-0 rounded-2xl focus:ring-2 focus:ring-indigo-500 ring-1 ring-slate-200 text-slate-900 font-semibold placeholder:text-slate-300 transition-all outline-none"
+                                                placeholder="Enter hackathon name..."
+                                                value={name}
+                                                onChange={e => setName(e.target.value)}
+                                            />
+                                        </div>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">Location</label>
+                                                <input
+                                                    type="text"
+                                                    className="w-full px-5 py-3.5 bg-slate-50 border-0 rounded-2xl focus:ring-2 focus:ring-indigo-500 ring-1 ring-slate-200 text-slate-900 font-semibold placeholder:text-slate-300 transition-all outline-none"
+                                                    placeholder="Online / City"
+                                                    value={location}
+                                                    onChange={e => setLocation(e.target.value)}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">Prize Pool</label>
+                                                <input
+                                                    type="text"
+                                                    className="w-full px-5 py-3.5 bg-slate-50 border-0 rounded-2xl focus:ring-2 focus:ring-indigo-500 ring-1 ring-slate-200 text-slate-900 font-semibold placeholder:text-slate-300 transition-all outline-none"
+                                                    placeholder="e.g. $5k"
+                                                    value={prize}
+                                                    onChange={e => setPrize(e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">Description</label>
+                                            <textarea
+                                                className="w-full px-5 py-3.5 bg-slate-50 border-0 rounded-2xl focus:ring-2 focus:ring-indigo-500 ring-1 ring-slate-200 text-slate-900 font-semibold placeholder:text-slate-300 transition-all outline-none resize-none"
+                                                rows="3"
+                                                placeholder="Paste hackathon link or details..."
+                                                value={description}
+                                                onChange={e => setDescription(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <section>
+                                    <div className="flex items-center mb-6">
+                                        <div className="w-8 h-8 rounded-lg bg-violet-100 text-violet-600 flex items-center justify-center mr-3 font-bold">2</div>
+                                        <h2 className="text-xl font-bold text-slate-800">Classification</h2>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">Category</label>
+                                            <select
+                                                className="w-full px-5 py-3.5 bg-slate-50 border-0 rounded-2xl focus:ring-2 focus:ring-indigo-500 ring-1 ring-slate-200 text-slate-900 font-semibold appearance-none outline-none"
+                                                value={category}
+                                                onChange={e => setCategory(e.target.value)}
+                                            >
+                                                <option>Web Development</option>
+                                                <option>Mobile Development</option>
+                                                <option>Machine Learning</option>
+                                                <option>AI/LLM</option>
+                                                <option>Blockchain</option>
+                                                <option>Other</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">Priority</label>
+                                            <select
+                                                className="w-full px-5 py-3.5 bg-slate-50 border-0 rounded-2xl focus:ring-2 focus:ring-indigo-500 ring-1 ring-slate-200 text-slate-900 font-bold appearance-none outline-none"
+                                                value={priority}
+                                                onChange={e => setPriority(e.target.value)}
+                                            >
+                                                <option className="text-blue-600">Low</option>
+                                                <option className="text-emerald-600">Medium</option>
+                                                <option className="text-orange-600">High</option>
+                                                <option className="text-red-600">Critical</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+
+                            {/* Right Column: Deadlines & Auth */}
+                            <div className="p-8 lg:p-10 space-y-10 bg-slate-50/50">
+                                <section>
+                                    <div className="flex items-center mb-6">
+                                        <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center mr-3 font-bold">3</div>
+                                        <h2 className="text-xl font-bold text-slate-800">Deadlines</h2>
+                                    </div>
+
+                                    <div className="space-y-6">
+                                        <div className="relative group">
+                                            <label className="block text-xs font-bold text-emerald-600 uppercase tracking-widest mb-2 px-1">Registration Closes *</label>
+                                            <input
+                                                type="datetime-local"
+                                                required
+                                                className="w-full px-5 py-3.5 bg-white border-0 rounded-2xl focus:ring-2 focus:ring-emerald-500 ring-1 ring-slate-200 text-slate-900 font-bold outline-none shadow-sm transition-all"
+                                                value={regDate}
+                                                onChange={e => setRegDate(e.target.value)}
+                                            />
+
+                                            {/* Time Presets */}
+                                            <div className="mt-3 flex flex-wrap gap-2 px-1">
+                                                <span className="text-[10px] font-black text-slate-400 uppercase self-center mr-1">Presets:</span>
+                                                {[
+                                                    { label: '00:00', time: '00:00' },
+                                                    { label: '09:00', time: '09:00' },
+                                                    { label: '21:00', time: '21:00' },
+                                                    { label: '23:59', time: '23:59' }
+                                                ].map((preset) => (
+                                                    <button
+                                                        key={preset.label}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const date = regDate ? regDate.split('T')[0] : new Date().toISOString().split('T')[0];
+                                                            setRegDate(`${date}T${preset.time}`);
+                                                        }}
+                                                        className="px-3 py-1 bg-slate-100 hover:bg-emerald-100 text-slate-500 hover:text-emerald-700 rounded-lg text-[10px] font-bold transition-colors border border-slate-200 hover:border-emerald-200"
+                                                    >
+                                                        {preset.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className={`p-6 rounded-3xl transition-all duration-500 ${includePpt ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-200' : 'bg-white text-slate-400 border border-slate-200 opacity-60'}`}>
+                                            <div className="flex items-center justify-between pointer-events-auto cursor-pointer" onClick={() => setIncludePpt(!includePpt)}>
+                                                <div>
+                                                    <h3 className="font-bold">PPT/Submission Phase</h3>
+                                                    <p className={`text-xs mt-1 ${includePpt ? 'text-indigo-100' : 'text-slate-400'}`}>Track the final submission date separately</p>
+                                                </div>
+                                                <div className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${includePpt ? 'bg-indigo-400' : 'bg-slate-200'}`}>
+                                                    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300 ${includePpt ? 'left-7' : 'left-1'}`} />
+                                                </div>
+                                            </div>
+
+                                            {includePpt && (
+                                                <div className="mt-6 pt-6 border-t border-indigo-500 animate-in fade-in zoom-in-95 duration-300 focus-within:scale-[1.02] transition-transform">
+                                                    <label className="block text-xs font-black uppercase tracking-widest mb-2 px-1 text-white/80">Submission Deadline</label>
+                                                    <input
+                                                        type="datetime-local"
+                                                        className="w-full px-5 py-3.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-white font-bold outline-none placeholder:text-white/50"
+                                                        value={pptDate}
+                                                        onChange={e => setPptDate(e.target.value)}
+                                                    />
+
+                                                    {/* Time Presets */}
+                                                    <div className="mt-3 flex flex-wrap gap-2 px-1">
+                                                        {[
+                                                            { label: '00:00', time: '00:00' },
+                                                            { label: '09:00', time: '09:00' },
+                                                            { label: '21:00', time: '21:00' },
+                                                            { label: '23:59', time: '23:59' }
+                                                        ].map((preset) => (
+                                                            <button
+                                                                key={preset.label}
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    const date = pptDate ? pptDate.split('T')[0] : (regDate ? regDate.split('T')[0] : new Date().toISOString().split('T')[0]);
+                                                                    setPptDate(`${date}T${preset.time}`);
+                                                                }}
+                                                                className="px-3 py-1 bg-white/10 hover:bg-white text-white/60 hover:text-indigo-600 rounded-lg text-[10px] font-bold transition-all border border-white/10 hover:border-white shadow-sm"
+                                                            >
+                                                                {preset.label}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <section className="pt-4">
+                                    <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center">
+                                                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+                                                    <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" />
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-sm font-bold text-slate-800">Google Calendar Sync</h3>
+                                                    <p className="text-[11px] text-slate-500 font-medium">Automatic event creation enabled</p>
+                                                </div>
+                                            </div>
+                                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                        </div>
+
+                                        <div className="flex flex-col gap-2">
+                                            <label className="flex items-center cursor-pointer group">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={notificationsEnabled}
+                                                    onChange={e => setNotificationsEnabled(e.target.checked)}
+                                                    className="w-5 h-5 rounded-lg border-2 border-slate-300 text-indigo-600 focus:ring-0 transition-all checked:border-indigo-600"
+                                                />
+                                                <span className="ml-3 text-xs font-bold text-slate-600 group-hover:text-slate-900 transition-colors uppercase tracking-wider">Enable Email Alerts</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                {/* Footer Actions */}
+                                <div className="flex flex-col sm:flex-row gap-4 pt-10">
+                                    <Link
+                                        to="/"
+                                        className="flex-1 px-8 py-4 bg-white border border-slate-200 rounded-2xl text-slate-600 font-bold hover:bg-slate-100 transition shadow-sm text-center"
+                                    >
+                                        Discard
+                                    </Link>
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="flex-[2] relative overflow-hidden group px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-700 transition disabled:bg-slate-300 shadow-xl shadow-indigo-200 disabled:shadow-none"
+                                    >
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                                        <span className="relative flex items-center justify-center">
+                                            {loading ? (
+                                                <>
+                                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                    Processing...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    Publish Reminder
+                                                    <svg className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                                    </svg>
+                                                </>
+                                            )}
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <p className="mt-8 text-center text-slate-400 font-semibold text-sm">
+                    Protected by end-to-end encryption. All reminders are sent via secure mail servers.
+                </p>
             </div>
         </div>
     );

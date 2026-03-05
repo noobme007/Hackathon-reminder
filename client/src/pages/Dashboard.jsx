@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import API from '../services/api';
 import { Link } from 'react-router-dom';
 import HackathonCard from '../components/HackathonCard';
+import ConfirmModal from '../components/ConfirmModal';
 
 const Dashboard = () => {
     const [hackathons, setHackathons] = useState([]);
@@ -10,6 +11,8 @@ const Dashboard = () => {
     const [filterType, setFilterType] = useState('active');
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('deadline');
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [deleteTargetId, setDeleteTargetId] = useState(null);
 
     const fetchHackathons = async () => {
         try {
@@ -36,7 +39,7 @@ const Dashboard = () => {
 
         // Search filter
         if (search.trim()) {
-            filtered = filtered.filter(h => 
+            filtered = filtered.filter(h =>
                 h.name.toLowerCase().includes(search.toLowerCase()) ||
                 h.category?.toLowerCase().includes(search.toLowerCase())
             );
@@ -63,15 +66,23 @@ const Dashboard = () => {
         filterHackathons(hackathons, filterType, searchTerm, sortBy);
     }, [filterType, searchTerm, sortBy, hackathons]);
 
-    const deleteHackathon = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this hackathon? This action cannot be undone.')) return;
+    const handleDeleteClick = (id) => {
+        setDeleteTargetId(id);
+        setIsDeleteModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteTargetId) return;
 
         try {
-            await API.delete(`/hackathons/${id}`);
-            setHackathons(hackathons.filter(h => h._id !== id));
+            await API.delete(`/hackathons/${deleteTargetId}`);
+            setHackathons(hackathons.filter(h => h._id !== deleteTargetId));
         } catch (e) {
             console.error("Failed to delete", e);
             alert('Failed to delete hackathon');
+        } finally {
+            setIsDeleteModalOpen(false);
+            setDeleteTargetId(null);
         }
     };
 
@@ -231,10 +242,20 @@ const Dashboard = () => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredHackathons.map(h => (
-                        <HackathonCard key={h._id} hackathon={h} onDelete={deleteHackathon} />
+                        <HackathonCard key={h._id} hackathon={h} onDelete={handleDeleteClick} />
                     ))}
                 </div>
             )}
+
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                title="Delete Hackathon?"
+                message="Are you sure you want to remove this hackathon? This action will permanently delete the reminder and cannot be undone."
+                confirmText="Yes, Delete it"
+                onConfirm={confirmDelete}
+                onCancel={() => setIsDeleteModalOpen(false)}
+                type="danger"
+            />
 
             <div className="mt-8 text-center text-gray-600 text-sm">
                 Showing {filteredHackathons.length} of {hackathons.length} hackathons

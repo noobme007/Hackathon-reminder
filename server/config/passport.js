@@ -2,10 +2,15 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/User');
 
 module.exports = function (passport) {
+    if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+        console.error('❌ GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET is missing in environment variables!');
+        return;
+    }
+
     passport.use(new GoogleStrategy({
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: '/api/auth/google/callback',
+        callbackURL: 'https://hackathon-reminder.onrender.com/api/auth/google/callback',
         scope: ['profile', 'email', 'https://www.googleapis.com/auth/calendar.events']
     },
         async (accessToken, refreshToken, profile, done) => {

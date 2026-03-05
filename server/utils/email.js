@@ -1,43 +1,43 @@
-const nodemailer = require('nodemailer');
+const axios = require('axios');
 
+/**
+ * Sends an email using Brevo's REST API.
+ * This bypasses SMTP port blocks on hosts like Render.
+ */
 const sendEmail = async ({ to, subject, text, html }) => {
     try {
-        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-            console.error('❌ Email credentials missing');
-            return { success: false, error: 'Credentials missing' };
+        const apiKey = process.env.EMAIL_PASS; // We store the API Key in EMAIL_PASS
+
+        if (!apiKey) {
+            console.error('❌ Brevo API Key missing (EMAIL_PASS environment variable)');
+            return { success: false, error: 'API Key missing' };
         }
 
-        // Create fresh transporter for every send attempt for stability
-        const transporter = nodemailer.createTransport({
-            host: 'smtp-relay.brevo.com',
-            port: 587,
-            secure: false, // TLS on port 587
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS.trim(),
+        console.log(`📡 Sending API request to Brevo for: ${to}`);
+
+        const response = await axios.post('https://api.brevo.com/v3/smtp/email', {
+            sender: {
+                name: "Hackathon Reminder",
+                email: "notificationguys@gmail.com"
             },
-            // High timeouts to handle cloud network spikes
-            connectionTimeout: 30000,
-            greetingTimeout: 30000,
-            socketTimeout: 30000,
-            debug: true, // Enable internal debugging logs
-            logger: true
+            to: [{ email: to }],
+            subject: subject,
+            textContent: text,
+            htmlContent: html || text
+        }, {
+            headers: {
+                'api-key': apiKey,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
         });
 
-        const mailOptions = {
-            from: `"Hackathon Reminder" <notificationguys@gmail.com>`,
-            to,
-            subject,
-            text,
-            html,
-        };
-
-        const info = await transporter.sendMail(mailOptions);
-        console.log(`✅ Email sent via Brevo to ${to}: ${info.messageId}`);
-        return { success: true, messageId: info.messageId };
+        console.log(`✅ Email sent via Brevo API: ${response.data.messageId}`);
+        return { success: true, messageId: response.data.messageId };
     } catch (error) {
-        console.error(`❌ Brevo email failed to ${to}:`, error.message);
-        return { success: false, error: error.message };
+        const errorMsg = error.response ? JSON.stringify(error.response.data) : error.message;
+        console.error(`❌ Brevo API failed:`, errorMsg);
+        return { success: false, error: errorMsg };
     }
 };
 

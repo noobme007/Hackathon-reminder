@@ -29,11 +29,24 @@ app.use(helmet({
 }));
 app.use(express.json());
 
+const MongoDBStore = require('connect-mongodb-session')(session);
+
+const store = new MongoDBStore({
+    uri: process.env.MONGO_URI,
+    collection: 'sessions'
+});
+
+// Catch errors
+store.on('error', function (error) {
+    console.log(error);
+});
+
 // Sessions
 app.use(session({
     secret: process.env.JWT_SECRET || 'secret',
     resave: false,
     saveUninitialized: false,
+    store: store,
     cookie: {
         secure: process.env.NODE_ENV === 'production',
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
@@ -64,8 +77,6 @@ app.use(cors({
 app.use('/api/auth', authRoutes);
 app.use('/api/hackathons', hackathonRoutes);
 
-const { sendEmail } = require('./utils/email');
-
 // Database Connection
 mongoose
     .connect(process.env.MONGO_URI)
@@ -73,16 +84,6 @@ mongoose
         console.log('MongoDB Connected Successfully');
         // Start Cron Job only after DB is ready
         startCron();
-
-        // 🚀 STARTUP NOTIFICATION TEST
-        if (process.env.DISCORD_WEBHOOK_URL) {
-            console.log('📬 Triggering startup notification test...');
-            sendEmail({
-                to: 'System Admin',
-                subject: '🚀 System Online: Hackathon Reminder',
-                text: 'Hii! Your server is live on Render. All notifications are now routed to Discord with Google Calendar integration!'
-            });
-        }
     })
     .catch((err) => {
         console.error('MongoDB Connection Failed:', err);

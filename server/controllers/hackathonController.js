@@ -51,8 +51,10 @@ exports.createHackathon = async (req, res) => {
             return res.status(400).json({ message: 'Please add all fields' });
         }
 
+        const userId = req.user.id || req.user._id;
+
         const hackathon = await Hackathon.create({
-            userId: req.user.id,
+            userId,
             name,
             registrationDeadline,
             pptDeadline,
@@ -60,7 +62,7 @@ exports.createHackathon = async (req, res) => {
 
         // 📅 Sync to Google Calendar automatically
         const User = require('../models/User');
-        const user = await User.findById(req.user.id);
+        const user = await User.findById(userId);
         if (user && user.accessToken) {
             const { addEventToGoogleCalendar } = require('../utils/googleCalendar');
             await addEventToGoogleCalendar(user, hackathon);

@@ -1,21 +1,25 @@
 const jwt = require('jsonwebtoken');
 
 const authMiddleware = (req, res, next) => {
-    const token = req.header('Authorization'); // Usually sent as "Bearer <token>"
+    // 1. Check for Passport/Google Session (New Way)
+    if (req.isAuthenticated && req.isAuthenticated()) {
+        return next();
+    }
+
+    // 2. Fallback to JWT Token (Old Way)
+    const token = req.header('Authorization');
 
     if (!token) {
-        return res.status(401).json({ message: 'No token, authorization denied' });
+        return res.status(401).json({ message: 'Authorization denied, please login' });
     }
 
     try {
-        // Split 'Bearer <token>'
         const tokenString = token.startsWith('Bearer ') ? token.slice(7, token.length) : token;
-
         const decoded = jwt.verify(tokenString, process.env.JWT_SECRET);
-        req.user = decoded; // { id: ... }
+        req.user = decoded;
         next();
     } catch (err) {
-        res.status(401).json({ message: 'Token is not valid' });
+        res.status(401).json({ message: 'Session expired, please login again' });
     }
 };
 

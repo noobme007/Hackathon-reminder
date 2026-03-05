@@ -4,24 +4,6 @@ import API from '../services/api';
 import CountdownTimer from './CountdownTimer';
 
 const HackathonCard = ({ hackathon, onDelete }) => {
-    const [testLoading, setTestLoading] = useState(false);
-    const [testMessage, setTestMessage] = useState('');
-
-    const handleTestEmail = async () => {
-        setTestLoading(true);
-        setTestMessage('');
-        try {
-            const response = await API.post(`/hackathons/${hackathon._id}/test-email`);
-            setTestMessage('✅ Test email sent! Check your inbox (or spam folder)');
-            setTimeout(() => setTestMessage(''), 5000);
-        } catch (error) {
-            console.error('Test email failed:', error);
-            setTestMessage('❌ Failed to send test email. Check backend logs.');
-            setTimeout(() => setTestMessage(''), 5000);
-        } finally {
-            setTestLoading(false);
-        }
-    };
     const getPriorityColor = (priority) => {
         switch (priority) {
             case 'Critical':
@@ -135,17 +117,6 @@ const HackathonCard = ({ hackathon, onDelete }) => {
                     )}
                 </div>
 
-                {/* Status Badges */}
-                <div className="mt-4 flex flex-wrap gap-2">
-                    {hackathon.notificationsEnabled !== false && (
-                        <div className="flex items-center text-[10px] font-bold uppercase tracking-wider text-green-700 bg-green-50 px-2 py-1 rounded border border-green-100">
-                            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                            </svg>
-                            Email Alerts
-                        </div>
-                    )}
-                </div>
             </div>
 
             {/* Footer */}
@@ -167,14 +138,6 @@ const HackathonCard = ({ hackathon, onDelete }) => {
                             </svg>
                         </a>
                     )}
-                    <button
-                        onClick={handleTestEmail}
-                        disabled={testLoading}
-                        className="flex-1 min-w-[110px] inline-flex items-center justify-center px-3 py-2 text-xs font-bold uppercase tracking-wider bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg transition disabled:opacity-50"
-                        title="Send a test email to verify reminders"
-                    >
-                        {testLoading ? '⏳ Wait' : '📧 Test Email'}
-                    </button>
                 </div>
 
                 <div className="flex justify-end items-center gap-2 pt-2 border-t border-gray-200/50">
@@ -197,15 +160,6 @@ const HackathonCard = ({ hackathon, onDelete }) => {
                         Delete
                     </button>
                 </div>
-
-                {testMessage && (
-                    <div className={`mt-2 text-[11px] font-bold px-3 py-2 rounded-lg text-center animate-in fade-in slide-in-from-top-2 duration-300 ${testMessage.includes('✅')
-                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
-                        : 'bg-red-50 text-red-700 border border-red-100'
-                        }`}>
-                        {testMessage}
-                    </div>
-                )}
             </div>
         </div>
     );

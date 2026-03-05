@@ -13,7 +13,7 @@ const AddHackathon = () => {
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState('Web Development');
     const [priority, setPriority] = useState('Medium');
-    const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+    const [notificationsEnabled, setNotificationsEnabled] = useState(false);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -35,7 +35,7 @@ const AddHackathon = () => {
                 description: description || '',
                 category: category || 'Web Development',
                 priority: priority || 'Medium',
-                notificationsEnabled: notificationsEnabled
+                notificationsEnabled: false,
             };
 
             if (includePpt && pptDate) {
@@ -315,18 +315,6 @@ const AddHackathon = () => {
                                             </div>
                                             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                                         </div>
-
-                                        <div className="flex flex-col gap-2">
-                                            <label className="flex items-center cursor-pointer group">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={notificationsEnabled}
-                                                    onChange={e => setNotificationsEnabled(e.target.checked)}
-                                                    className="w-5 h-5 rounded-lg border-2 border-slate-300 text-indigo-600 focus:ring-0 transition-all checked:border-indigo-600"
-                                                />
-                                                <span className="ml-3 text-xs font-bold text-slate-600 group-hover:text-slate-900 transition-colors uppercase tracking-wider">Enable Email Alerts</span>
-                                            </label>
-                                        </div>
                                     </div>
                                 </section>
 
@@ -370,7 +358,7 @@ const AddHackathon = () => {
                 </div>
 
                 <p className="mt-8 text-center text-slate-400 font-semibold text-sm">
-                    Protected by end-to-end encryption. All reminders are sent via secure mail servers.
+                    Protected by end-to-end encryption. All events are synced via secure protocols.
                 </p>
             </div>
         </div>

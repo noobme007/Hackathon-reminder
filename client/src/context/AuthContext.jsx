@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
         const urlId = params.get('id');
 
         if (urlToken && urlId) {
+            console.log('🔑 Token found in URL, initializing user...');
             const userData = {
                 _id: urlId,
                 name: params.get('name'),
@@ -22,7 +23,11 @@ export const AuthProvider = ({ children }) => {
         }
 
         const savedUser = localStorage.getItem('user');
-        return savedUser ? JSON.parse(savedUser) : null;
+        if (savedUser) {
+            console.log('📦 Found user in localStorage');
+            return JSON.parse(savedUser);
+        }
+        return null;
     });
 
     const [loading, setLoading] = useState(true);

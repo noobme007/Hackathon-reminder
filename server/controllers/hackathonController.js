@@ -63,6 +63,8 @@ exports.createHackathon = async (req, res) => {
         // 📅 Sync to Google Calendar automatically
         const User = require('../models/User');
         const user = await User.findById(userId);
+        console.log(`📅 Attempting Sync for: ${user?.email}. Has Token: ${!!user?.accessToken}`);
+
         if (user && user.accessToken) {
             const { addEventToGoogleCalendar } = require('../utils/googleCalendar');
             await addEventToGoogleCalendar(user, hackathon);

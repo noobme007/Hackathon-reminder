@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'https://hackathon-reminder-production.up.railway.app/api',
+    baseURL: import.meta.env.VITE_API_URL || 'https://hackathon-reminder.onrender.com/api',
+    withCredentials: true,
 });
 
 API.interceptors.request.use((req) => {

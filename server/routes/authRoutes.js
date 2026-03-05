@@ -25,4 +25,14 @@ router.get('/google/callback',
     }
 );
 
+// @desc    Get current user
+// @route   GET /api/auth/me
+router.get('/me', (req, res) => {
+    if (req.user) {
+        res.status(200).json(req.user);
+    } else {
+        res.status(401).json({ message: 'Not authenticated' });
+    }
+});
+
 module.exports = router;

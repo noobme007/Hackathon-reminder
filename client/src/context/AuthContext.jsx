@@ -7,10 +7,21 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
-        const savedUser = JSON.parse(localStorage.getItem('user'));
-        if (savedUser) {
-            setUser(savedUser);
-        }
+        const checkUser = async () => {
+            const savedUser = JSON.parse(localStorage.getItem('user'));
+            if (savedUser) {
+                setUser(savedUser);
+            } else {
+                try {
+                    const { data } = await API.get('/auth/me');
+                    localStorage.setItem('user', JSON.stringify(data));
+                    setUser(data);
+                } catch (error) {
+                    // Not logged in, that's fine
+                }
+            }
+        };
+        checkUser();
     }, []);
 
     const login = async (email, password) => {

@@ -1,43 +1,43 @@
-const axios = require('axios');
+const nodemailer = require('nodemailer');
 
 /**
- * Sends an email using Brevo's REST API.
- * This bypasses SMTP port blocks on hosts like Render.
+ * Sends an email using Gmail SMTP.
+ * Note: If Render blocks the port, this might time out. 
  */
 const sendEmail = async ({ to, subject, text, html }) => {
     try {
-        const apiKey = process.env.EMAIL_PASS; // We store the API Key in EMAIL_PASS
-
-        if (!apiKey) {
-            console.error('❌ Brevo API Key missing (EMAIL_PASS environment variable)');
-            return { success: false, error: 'API Key missing' };
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+            console.error('❌ Gmail credentials missing in environment variables');
+            return { success: false, error: 'Credentials missing' };
         }
 
-        console.log(`📡 Sending API request to Brevo for: ${to}`);
-
-        const response = await axios.post('https://api.brevo.com/v3/smtp/email', {
-            sender: {
-                name: "Hackathon Reminder",
-                email: "notificationguys@gmail.com"
+        // Create transporter using explicit Gmail SMTP settings
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true, // Use SSL
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS.replace(/\s+/g, ''), // Clean any spaces
             },
-            to: [{ email: to }],
-            subject: subject,
-            textContent: text,
-            htmlContent: html || text
-        }, {
-            headers: {
-                'api-key': apiKey,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
+            connectionTimeout: 20000, // 20 seconds
+            socketTimeout: 20000,
         });
 
-        console.log(`✅ Email sent via Brevo API: ${response.data.messageId}`);
-        return { success: true, messageId: response.data.messageId };
+        const mailOptions = {
+            from: `"Hackathon Reminder" <${process.env.EMAIL_USER}>`,
+            to,
+            subject,
+            text,
+            html: html || text
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`✅ Gmail sent to ${to}: ${info.messageId}`);
+        return { success: true, messageId: info.messageId };
     } catch (error) {
-        const errorMsg = error.response ? JSON.stringify(error.response.data) : error.message;
-        console.error(`❌ Brevo API failed:`, errorMsg);
-        return { success: false, error: errorMsg };
+        console.error(`❌ Gmail failed to ${to}:`, error.message);
+        return { success: false, error: error.message };
     }
 };
 

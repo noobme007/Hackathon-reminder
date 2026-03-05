@@ -1,26 +1,28 @@
 const nodemailer = require('nodemailer');
 
-// Create a persistent transporter for Brevo/SMTP Relay
-let transporter = nodemailer.createTransport({
-    host: 'smtp-relay.brevo.com',
-    port: 587,
-    secure: false, // TLS on port 587
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS ? process.env.EMAIL_PASS.replace(/\s+/g, '') : '',
-    },
-    // Production stability settings
-    connectionTimeout: 10000,
-    socketTimeout: 10000,
-    requireTLS: true
-});
-
 const sendEmail = async ({ to, subject, text, html }) => {
     try {
         if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
             console.error('❌ Email credentials missing');
             return { success: false, error: 'Credentials missing' };
         }
+
+        // Create fresh transporter for every send attempt for stability
+        const transporter = nodemailer.createTransport({
+            host: 'smtp-relay.brevo.com',
+            port: 587,
+            secure: false, // TLS on port 587
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS.trim(),
+            },
+            // High timeouts to handle cloud network spikes
+            connectionTimeout: 30000,
+            greetingTimeout: 30000,
+            socketTimeout: 30000,
+            debug: true, // Enable internal debugging logs
+            logger: true
+        });
 
         const mailOptions = {
             from: `"Hackathon Reminder" <notificationguys@gmail.com>`,

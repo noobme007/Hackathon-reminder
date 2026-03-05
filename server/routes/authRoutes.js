@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login } = require('../controllers/authController');
+const { register, login, generateToken } = require('../controllers/authController');
 const passport = require('passport');
 
 router.post('/signup', register);
@@ -14,14 +14,15 @@ router.get('/google', passport.authenticate('google', {
     prompt: 'consent'
 }));
 
-// @desc    Google auth callback
-// @route   GET /api/auth/google/callback
 router.get('/google/callback',
     passport.authenticate('google', { failureRedirect: '/login' }),
     (req, res) => {
-        // Successful authentication, redirect to frontend root
+        // Successful authentication, redirect to frontend root with token
         const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
-        res.redirect(`${clientUrl}/`);
+        const token = generateToken(req.user._id);
+        // We append the token and basic user info to the URL as a fallback for mobile Safari/private mode
+        // which often blocks the cross-domain session cookie
+        res.redirect(`${clientUrl}/?token=${token}&id=${req.user._id}&name=${encodeURIComponent(req.user.name)}&email=${req.user.email}`);
     }
 );
 

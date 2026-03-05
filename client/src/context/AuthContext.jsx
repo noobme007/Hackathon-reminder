@@ -8,6 +8,28 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const checkUser = async () => {
+            // 1. Check if we just redirected from Google (token in URL)
+            const params = new URLSearchParams(window.location.search);
+            const urlToken = params.get('token');
+            const urlId = params.get('id');
+            const urlName = params.get('name');
+            const urlEmail = params.get('email');
+
+            if (urlToken && urlId) {
+                const userData = {
+                    _id: urlId,
+                    name: urlName,
+                    email: urlEmail,
+                    token: urlToken
+                };
+                localStorage.setItem('user', JSON.stringify(userData));
+                setUser(userData);
+                // Clean up URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+                return;
+            }
+
+            // 2. Fallback to existing localStorage check
             const savedUser = JSON.parse(localStorage.getItem('user'));
             if (savedUser) {
                 setUser(savedUser);

@@ -17,11 +17,19 @@ router.get('/google', passport.authenticate('google', {
 router.get('/google/callback',
     passport.authenticate('google', { failureRedirect: '/login' }),
     (req, res) => {
-        // Successful authentication, redirect to frontend root with token
-        const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+        // Successful authentication
+        // Dynamically determine the client URL: use the origin that referred the request if possible
+        const origin = req.get('origin') || req.get('referer');
+        let clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+
+        // If the request came from a known trusted domain but CLIENT_URL is different, 
+        // we should try to stay on that domain.
+        if (origin && (origin.includes('vercel.app') || origin.includes('localhost'))) {
+            // Remove path from referer if present
+            clientUrl = new URL(origin).origin;
+        }
+
         const token = generateToken(req.user._id);
-        // We append the token and basic user info to the URL as a fallback for mobile Safari/private mode
-        // which often blocks the cross-domain session cookie
         res.redirect(`${clientUrl}/?token=${token}&id=${req.user._id}&name=${encodeURIComponent(req.user.name)}&email=${req.user.email}`);
     }
 );

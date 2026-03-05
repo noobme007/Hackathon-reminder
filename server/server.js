@@ -76,6 +76,7 @@ app.use(limiter);
 // CORS Config for Production
 const allowedOrigins = [
     'https://hackathon-reminder.vercel.app',
+    'https://reminder.vercel.app',
     'http://localhost:5173'
 ];
 

@@ -29,26 +29,47 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const verifyUser = async () => {
-            // Handle URL cleanup if we just logged in via Google
+            // 1. Double-check for URL tokens (Aggressive Sync)
             const params = new URLSearchParams(window.location.search);
+            const urlToken = params.get('token');
+            const urlId = params.get('id');
+
+            if (urlToken && urlId && !user) {
+                const userData = {
+                    _id: urlId,
+                    name: params.get('name'),
+                    email: params.get('email'),
+                    token: urlToken
+                };
+                localStorage.setItem('user', JSON.stringify(userData));
+                setUser(userData);
+                window.history.replaceState({}, document.title, window.location.pathname);
+                setLoading(false);
+                return;
+            }
+
+            // 2. Clear URL if we already have the user
             if (params.get('token')) {
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
-            // Sync with backend session if user is not in localStorage
+            // 3. Sync with backend if needed
             if (!user) {
                 try {
                     const { data } = await API.get('/auth/me');
-                    localStorage.setItem('user', JSON.stringify(data));
-                    setUser(data);
+                    const userData = { ...data, token: data.token || user?.token };
+                    localStorage.setItem('user', JSON.stringify(userData));
+                    setUser(userData);
                 } catch (error) {
                     // Not logged in
                 }
             }
-            setLoading(false);
+
+            // Small delay to prevent layout thrashing on mobile
+            setTimeout(() => setLoading(false), 300);
         };
         verifyUser();
-    }, []);
+    }, [user]);
 
     const login = async (email, password) => {
         try {

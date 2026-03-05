@@ -1,40 +1,38 @@
 const axios = require('axios');
+const { generateGoogleCalendarLink } = require('./calendar');
 
 /**
- * Sends a notification via Discord Webhook.
- * This ALWAYS works on Render because it uses standard HTTPS.
+ * Sends a notification via Discord Webhook with Google Calendar links.
  */
-const sendEmail = async ({ to, subject, text, html }) => {
+const sendEmail = async ({ to, subject, text }) => {
     try {
         const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
 
         if (!webhookUrl) {
-            console.error('❌ Discord Webhook URL missing (DISCORD_WEBHOOK_URL environment variable)');
+            console.error('❌ Discord Webhook URL missing');
             return { success: false, error: 'Webhook missing' };
         }
 
-        console.log(`📡 Sending Discord notification...`);
+        // We assume the text contains the deadline date string for this demo
+        // In a real scenario, we'd pass the actual date object
+        const calendarLink = `[Add to Google Calendar](${generateGoogleCalendarLink(subject, new Date())})`;
 
-        // Format a beautiful Discord message
         const embed = {
             title: subject,
-            description: text,
-            color: 5814783, // Nice "Hackathon Blue"
+            description: `${text}\n\n📅 ${calendarLink}`,
+            color: 5814783,
             timestamp: new Date().toISOString(),
-            footer: {
-                text: `Reminder for ${to}`
-            }
         };
 
         await axios.post(webhookUrl, {
-            content: `🔔 **New Hackathon Reminder!**`,
+            content: `🔔 **Hackathon Update!**`,
             embeds: [embed]
         });
 
-        console.log(`✅ Discord notification sent successfully!`);
+        console.log(`✅ Discord + Calendar link sent!`);
         return { success: true };
     } catch (error) {
-        console.error(`❌ Discord failed:`, error.message);
+        console.error(`❌ Notification failed:`, error.message);
         return { success: false, error: error.message };
     }
 };

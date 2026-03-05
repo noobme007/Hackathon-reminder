@@ -58,6 +58,14 @@ exports.createHackathon = async (req, res) => {
             pptDeadline,
         });
 
+        // 📅 Sync to Google Calendar automatically
+        const User = require('../models/User');
+        const user = await User.findById(req.user.id);
+        if (user && user.accessToken) {
+            const { addEventToGoogleCalendar } = require('../utils/googleCalendar');
+            await addEventToGoogleCalendar(user, hackathon);
+        }
+
         res.status(201).json(hackathon);
     } catch (error) {
         console.error(error);

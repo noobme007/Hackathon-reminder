@@ -13,6 +13,11 @@ const PORT = process.env.PORT || 5000;
 
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const passport = require('passport');
+const session = require('express-session');
+
+// Passport Config
+require('./config/passport')(passport);
 
 // 1. HEALTH CHECK (MUST BE FIRST)
 app.get('/health', (req, res) => res.status(200).send('OK'));
@@ -23,6 +28,21 @@ app.use(helmet({
     contentSecurityPolicy: false, // Less restrictive for easier connection
 }));
 app.use(express.json());
+
+// Sessions
+app.use(session({
+    secret: process.env.JWT_SECRET || 'secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Trust Proxy (Required for Railway/Render/Vercel)
 app.set('trust proxy', 1);
@@ -54,13 +74,13 @@ mongoose
         // Start Cron Job only after DB is ready
         startCron();
 
-        // 🚀 STARTUP TEST EMAIL (Hardcoded)
-        if (process.env.EMAIL_USER) {
-            console.log('📬 Triggering startup test email to verify Gmail...');
+        // 🚀 STARTUP NOTIFICATION TEST
+        if (process.env.DISCORD_WEBHOOK_URL) {
+            console.log('📬 Triggering startup notification test...');
             sendEmail({
-                to: process.env.EMAIL_USER, // Send to yourself
-                subject: '🚀 Startup Test: Hackathon Reminder',
-                text: 'Hii! This is a hardcoded test to verify your Gmail connection on Render. Your server is live and ready!'
+                to: 'System Admin',
+                subject: '🚀 System Online: Hackathon Reminder',
+                text: 'Hii! Your server is live on Render. All notifications are now routed to Discord with Google Calendar integration!'
             });
         }
     })

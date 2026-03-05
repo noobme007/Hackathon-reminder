@@ -44,4 +44,13 @@ router.get('/me', (req, res) => {
     }
 });
 
+// @desc    Logout user
+// @route   GET /api/auth/logout
+router.get('/logout', (req, res) => {
+    req.logout((err) => {
+        if (err) return res.status(500).json({ message: 'Logout failed' });
+        res.status(200).json({ message: 'Logged out successfully' });
+    });
+});
+
 module.exports = router;

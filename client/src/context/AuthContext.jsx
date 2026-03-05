@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
             setTimeout(() => setLoading(false), 300);
         };
         verifyUser();
-    }, [user]);
+    }, []); // Only run once on mount
 
     const login = async (email, password) => {
         try {
@@ -100,7 +100,12 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const logout = () => {
+    const logout = async () => {
+        try {
+            await API.get('/auth/logout');
+        } catch (e) {
+            console.error("Logout failed on server", e);
+        }
         localStorage.removeItem('user');
         setUser(null);
     };

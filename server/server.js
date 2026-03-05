@@ -44,6 +44,8 @@ app.use(cors({
 app.use('/api/auth', authRoutes);
 app.use('/api/hackathons', hackathonRoutes);
 
+const { sendEmail } = require('./utils/email');
+
 // Database Connection
 mongoose
     .connect(process.env.MONGO_URI)
@@ -51,6 +53,16 @@ mongoose
         console.log('MongoDB Connected Successfully');
         // Start Cron Job only after DB is ready
         startCron();
+
+        // 🚀 STARTUP TEST EMAIL (Hardcoded)
+        if (process.env.EMAIL_USER) {
+            console.log('📬 Triggering startup test email to verify Gmail...');
+            sendEmail({
+                to: process.env.EMAIL_USER, // Send to yourself
+                subject: '🚀 Startup Test: Hackathon Reminder',
+                text: 'Hii! This is a hardcoded test to verify your Gmail connection on Render. Your server is live and ready!'
+            });
+        }
     })
     .catch((err) => {
         console.error('MongoDB Connection Failed:', err);

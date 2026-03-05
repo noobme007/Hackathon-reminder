@@ -51,8 +51,10 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     store: store,
+    proxy: true, // Required for secure cookies on Render
     cookie: {
         secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Needed for cross-domain cookies
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
 }));
@@ -72,8 +74,19 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // CORS Config for Production
+const allowedOrigins = [
+    'https://hackathon-reminder.vercel.app',
+    'http://localhost:5173'
+];
+
 app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true
 }));
 

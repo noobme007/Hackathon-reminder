@@ -1,47 +1,40 @@
-const nodemailer = require('nodemailer');
+const axios = require('axios');
 
 /**
- * Sends an email using Gmail SMTP (Port 587 / STARTTLS).
- * This is the alternative to Port 465 and often works better on Render.
+ * Sends a notification via Discord Webhook.
+ * This ALWAYS works on Render because it uses standard HTTPS.
  */
 const sendEmail = async ({ to, subject, text, html }) => {
     try {
-        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-            console.error('❌ Gmail credentials missing');
-            return { success: false, error: 'Credentials missing' };
+        const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+
+        if (!webhookUrl) {
+            console.error('❌ Discord Webhook URL missing (DISCORD_WEBHOOK_URL environment variable)');
+            return { success: false, error: 'Webhook missing' };
         }
 
-        // Create transporter using Port 587 (STARTTLS)
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 587,
-            secure: false, // Use STARTTLS instead of direct SSL
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS.replace(/\s+/g, ''),
-            },
-            tls: {
-                // This is crucial for cloud servers to avoid certificate handshake errors
-                rejectUnauthorized: false
-            },
-            connectionTimeout: 30000,
-            socketTimeout: 30000,
-        });
+        console.log(`📡 Sending Discord notification...`);
 
-        const mailOptions = {
-            from: `"Hackathon Reminder" <${process.env.EMAIL_USER}>`,
-            to,
-            subject,
-            text,
-            html: html || text
+        // Format a beautiful Discord message
+        const embed = {
+            title: subject,
+            description: text,
+            color: 5814783, // Nice "Hackathon Blue"
+            timestamp: new Date().toISOString(),
+            footer: {
+                text: `Reminder for ${to}`
+            }
         };
 
-        console.log(`📡 Attempting Gmail delivery via Port 587 to ${to}...`);
-        const info = await transporter.sendMail(mailOptions);
-        console.log(`✅ Gmail sent: ${info.messageId}`);
-        return { success: true, messageId: info.messageId };
+        await axios.post(webhookUrl, {
+            content: `🔔 **New Hackathon Reminder!**`,
+            embeds: [embed]
+        });
+
+        console.log(`✅ Discord notification sent successfully!`);
+        return { success: true };
     } catch (error) {
-        console.error(`❌ Gmail Port 587 failed:`, error.message);
+        console.error(`❌ Discord failed:`, error.message);
         return { success: false, error: error.message };
     }
 };

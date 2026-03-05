@@ -17,6 +17,10 @@ const passport = require('passport');
 const session = require('express-session');
 
 // Passport Config
+console.log('🔍 Checking Google Env Vars:', {
+    hasID: !!process.env.GOOGLE_CLIENT_ID,
+    hasSecret: !!process.env.GOOGLE_CLIENT_SECRET
+});
 require('./config/passport')(passport);
 
 // 1. HEALTH CHECK (MUST BE FIRST)
